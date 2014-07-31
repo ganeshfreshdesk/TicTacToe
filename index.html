@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <title>Game-TicTacToe</title>
+    <style>
+     tr { width: 300px;height:30px;background-color: yellow;border:15px solid black}
+      td { width: 30px;height:50px;background-color: yellow;border:15px solid black}
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+<div id ="box"><table>
+ <tr> <td id = "canvas0" onclick="ontheclick(0)"></td>
+  <td id = "canvas1" onclick="ontheclick(1)"></td>
+  <td id = "canvas2" onclick="ontheclick(2)"></td></tr>
+ <tr> <td id = "canvas3" onclick="ontheclick(3)"></td>
+  <td id = "canvas4" onclick="ontheclick(4)"></td>
+  <td id = "canvas5" onclick="ontheclick(5)"></td></tr>
+ <tr> <td id = "canvas6" onclick="ontheclick(6)"></td>
+  <td id = "canvas7" onclick="ontheclick(7)"></td>
+  <td id = "canvas8" onclick="ontheclick(8)"></td></tr>
+</table>
+</div>
+
+
+    <script>
+      var socket = io();
+      var count = 0;
+      var logic= [-1,-1,-1,-1,-1,-1,-1,-1,-1]
+      var cou;
+     
+      function ontheclick(canvasNumber){
+         if (logic[canvasNumber] == -1)
+            {
+             var c=document.getElementById("canvas"+canvasNumber);
+             var ctx=c.getContext("2d");
+             ctx.font="20px Georgia";
+             logic[canvasNumber] = count%2;
+             
+             if (count%2 == 0)
+               ctx.fillText("X",20,30);
+             else
+               ctx.fillText("O",20,30);
+
+              
+              if ((logic[0] == 1 && logic[1] == 1 && logic[2] == 1) || (logic[3] == 1 && logic[4] == 1 && logic[5] == 1) || (logic[6] == 1 && logic[7] == 1 && logic[8] == 1) || (logic[0] == 1 && logic[4] == 1 && logic[8] == 1) || (logic[2] == 1 && logic[4] == 1 && logic[6] == 1))
+               { alert("Player O Wins");
+             history.go(0);
+           }
+
+              if ((logic[0] == 0 && logic[1] == 0 && logic[2] == 0) || (logic[3] == 0 && logic[4] == 0 && logic[5] == 0) || (logic[6] == 0 && logic[7] == 0 && logic[8] == 0) || (logic[0] == 0 && logic[4] == 0 && logic[8] == 0) || (logic[2] == 0 && logic[4] == 0 && logic[6] == 0))
+                {alert("Player X Wins");
+                 history.go(0);
+               }
+                cou = 0;
+               for (i = 0; i < 9; i++) {
+                if (logic[i] == -1)
+                  cou += 1;
+              }
+
+                if (cou == 0)
+                {
+                  alert("Match Tied");
+                  history.go(0);
+                }
+             socket.emit('tic tac', logic );
+            }
+         else
+            alert("Space already occupied");
+        }
+        
+      
+
+      socket.on('tic tac', function(game_arr){
+        $('#messages').append($('<li>').text(game_arr));
+            count += 1;
+
+         for (i = 0; i < 9; i++) {
+          if (game_arr[i] != -1)
+          {
+             var c=document.getElementById("canvas"+i);
+             var ctx=c.getContext("2d");
+             ctx.font="20px Georgia";
+             if (game_arr[i] == 1)
+             { logic[i] = 1;
+             ctx.fillText("O",20,30);
+             }
+             else {
+              logic[i]= 0;
+             ctx.fillText("X",20,30);
+             }
+          }
+         }
+      });
+    </script>
+  </body>
+</html>
